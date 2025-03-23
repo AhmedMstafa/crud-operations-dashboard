@@ -40,7 +40,7 @@ const Product: React.FC<ProductProps> = ({ product }) => {
   return (
     <article
       className={`order-${
-        isMatched ? 'first' : 'last opacity-10'
+        isMatched ? 'first ' : 'last opacity-10 '
       } flex flex-col items-center hover:opacity-100 transition`}
     >
       <div className="space-y-2">
