@@ -22,7 +22,7 @@ const DeleteProduct: React.FC = () => {
   };
 
   return (
-    <div className="border h-full p-5">
+    <div className="p-5">
       <div className="flex flex-col justify-center gap-5">
         <p className="text-center">Are You Sure To Delete This Product !</p>
         <div className="flex justify-center gap-5">

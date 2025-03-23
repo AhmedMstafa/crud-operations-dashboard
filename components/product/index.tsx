@@ -4,6 +4,7 @@ import Actions from '../actions';
 import inProduct from '@/models/product';
 import ProductsContext, { ProductActionType } from '@/store/product-context';
 import PopupContext, { PopupType } from '@/store/popup-context';
+import Image from 'next/image';
 
 interface ProductProps {
   product: inProduct;
@@ -34,20 +35,33 @@ const Product: React.FC<ProductProps> = ({ product }) => {
     }
   }
 
-  let productClasses: string =
-    'order-first flex flex-col items-center gap-5 border my-5 p-5';
-
-  if (!matchedProductIds.includes(product.id)) {
-    productClasses =
-      'order-last opacity-50 flex flex-col items-center gap-5 border my-5 p-5';
-  }
+  const isMatched = matchedProductIds.includes(product.id);
 
   return (
-    <article className={productClasses}>
-      <div className="w-full text-center">
-        <h2 className="text-2xl font-bold">{product.title}</h2>
+    <article
+      className={`order-${
+        isMatched ? 'first' : 'last opacity-10'
+      } flex flex-col items-center hover:opacity-100 transition`}
+    >
+      <div className="space-y-2">
+        <div className="relative overflow-hidden bg-gray-100 flex justify-center group cursor-pointer border">
+          <div className="relative w-[260px] md:w-[325px] h-[260px] md:h-[325px]">
+            <Image
+              src={product.images[0]}
+              alt="product image"
+              fill
+              sizes="100%"
+              className="object-cover max-w-full"
+              priority
+            />
+          </div>
+          <Actions onClick={actionHandler} />
+        </div>
       </div>
-      <Actions onClick={actionHandler} />
+      <div className="w-[260px] md:w-[325px]">
+        <p className=" text-center">{product.title}</p>
+        <strong className="mt-auto text-center block">${product.price}</strong>
+      </div>
     </article>
   );
 };

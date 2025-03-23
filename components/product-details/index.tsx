@@ -15,7 +15,7 @@ const ProductDetails: React.FC = () => {
   if (!selectedProduct) return null;
 
   return (
-    <div className="border h-full p-5">
+    <div className="p-5">
       <div className="flex flex-col justify-center gap-5">
         <h2 className="text-2xl font-bold text-center">
           {selectedProduct.title}
@@ -25,18 +25,19 @@ const ProductDetails: React.FC = () => {
           Price: ${selectedProduct.price}
         </p>
         <p className="text-center">Category: {selectedProduct.category.name}</p>
-        {/* {selectedProduct.images && selectedProduct.images.length > 0 && (
-          <div className="flex justify-center gap-3">
+        {selectedProduct.images && selectedProduct.images.length > 0 && (
+          <div className="flex justify-center gap-3 flex-wrap">
             {selectedProduct.images.map((img, idx) => (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={idx}
                 src={img}
-                alt={selectedProduct.title}
+                alt={`${selectedProduct.title} image ${idx + 1}`}
                 className="w-16 h-16 object-cover rounded"
               />
             ))}
           </div>
-        )} */}
+        )}
         <Button text="Close" onClick={closeHandler} />
       </div>
     </div>

@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import Input from '../input';
 import Button from '../button';
 import ProductsContext from '@/store/product-context';
@@ -12,12 +12,14 @@ type FormInputs = {
   price: number;
   categoryName: string;
   categoryImage: string;
-  images: string;
 };
 
 const AddProduct: React.FC = () => {
   const { addProduct } = React.useContext(ProductsContext);
   const { closePopup } = React.useContext(PopupContext);
+
+  const [previewImages, setPreviewImages] = useState<string[]>([]); // State for image previews
+  const [imageError, setImageError] = useState<string | null>(null); // State for image validation error
 
   const {
     register,
@@ -26,9 +28,22 @@ const AddProduct: React.FC = () => {
     formState: { errors },
   } = useForm<FormInputs>();
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const filesArray = Array.from(event.target.files);
+      const previewURLs = filesArray.map((file) => URL.createObjectURL(file));
+      setPreviewImages(previewURLs);
+      setImageError(null);
+    }
+  };
+
   const submitHandler = (formData: FormInputs) => {
-    const { title, description, price, categoryName, categoryImage, images } =
-      formData;
+    if (previewImages.length === 0) {
+      setImageError('Please upload at least one image.');
+      return;
+    }
+
+    const { title, description, price, categoryName, categoryImage } = formData;
 
     const newProduct = {
       id: Date.now(),
@@ -42,13 +57,14 @@ const AddProduct: React.FC = () => {
         image: categoryImage || '',
         slug: categoryName.toLowerCase().replace(/\s+/g, '-'),
       },
-      images: images.split(',').map((url: string) => url.trim()),
+      images: previewImages,
       isDeleted: false,
     };
 
     addProduct(newProduct);
 
     reset();
+    setPreviewImages([]);
     closePopup();
   };
 
@@ -59,7 +75,7 @@ const AddProduct: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit(submitHandler)}
-      className="border max-h-90 overflow-y-scroll p-5"
+      className="flex flex-col gap-5 max-h-[80vh] overflow-y-scroll p-5"
     >
       <Input
         {...register('title', { required: 'Title is required' })}
@@ -100,38 +116,29 @@ const AddProduct: React.FC = () => {
         label="Category Name"
         type="text"
       />
-      <Input
-        {...register('categoryImage', {
-          required: 'Category Image is required',
-          pattern: {
-            value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/, // Regex to validate image file extensions
-            message: 'Invalid image URL',
-          },
-        })}
-        error={Boolean(errors.categoryImage)}
-        errorMessage={errors.categoryImage?.message || ''}
-        id="categoryImage"
-        name="categoryImage"
-        label="Category Image URL"
-        type="text"
-      />
-      <Input
-        {...register('images', {
-          required: 'Images are required',
-          validate: (value) => {
-            const urls = value.split(',').map((url) => url.trim());
-            const regex =
-              /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-            return urls.every((url) => regex.test(url)) || 'Invalid image URLs';
-          },
-        })}
-        error={Boolean(errors.images)}
-        errorMessage={errors.images?.message || ''}
-        id="images"
-        name="images"
-        label="Product Images (comma-separated URLs)"
-        type="text"
-      />
+      <div>
+        <label htmlFor="images">Upload Product Images:</label>
+        <input
+          type="file"
+          id="images"
+          name="images"
+          accept="image/*"
+          multiple
+          onChange={handleImageChange}
+        />
+        {imageError && <p style={{ color: 'red' }}>{imageError}</p>}{' '}
+        <div className="image-preview">
+          {previewImages.map((image, index) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={index}
+              src={image}
+              alt={`Preview ${index + 1}`}
+              style={{ maxWidth: '100px', maxHeight: '100px', margin: '5px' }}
+            />
+          ))}
+        </div>
+      </div>
       <div className="flex justify-center gap-5 pt-5">
         <Button text="Add" />
         <Button text="Close" onClick={closeHandler} />
