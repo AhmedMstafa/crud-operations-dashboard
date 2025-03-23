@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Input from '../input';
 import Button from '../button';
 import ProductsContext from '@/store/product-context';
@@ -13,12 +13,14 @@ type FormInputs = {
   description: string;
   categoryName: string;
   categoryImage: string;
-  images: string;
 };
 
 const UpdateProduct: React.FC = () => {
   const { editProduct, selectedProduct } = React.useContext(ProductsContext);
   const { productId, closePopup } = React.useContext(PopupContext);
+
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   const {
     register,
@@ -33,7 +35,6 @@ const UpdateProduct: React.FC = () => {
       description: '',
       categoryName: '',
       categoryImage: '',
-      images: '',
     },
   });
 
@@ -46,21 +47,29 @@ const UpdateProduct: React.FC = () => {
         description: selectedProduct.description,
         categoryName: selectedProduct.category.name,
         categoryImage: selectedProduct.category.image,
-        images: selectedProduct.images.join(', '),
       });
+      setPreviewImages(selectedProduct.images);
+      setImageError(null);
     }
   }, [selectedProduct, reset]);
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const filesArray = Array.from(event.target.files);
+      const previewURLs = filesArray.map((file) => URL.createObjectURL(file));
+      setPreviewImages(previewURLs);
+      setImageError(null);
+    }
+  };
+
   const submitHandler = (formData: FormInputs) => {
-    const {
-      title,
-      slug,
-      price,
-      description,
-      categoryName,
-      categoryImage,
-      images,
-    } = formData;
+    if (previewImages.length === 0) {
+      setImageError('Please upload at least one image.');
+      return;
+    }
+
+    const { title, slug, price, description, categoryName, categoryImage } =
+      formData;
 
     if (!productId) {
       console.error('Product ID not available.');
@@ -78,7 +87,7 @@ const UpdateProduct: React.FC = () => {
         image: categoryImage,
         slug,
       },
-      images: images.split(',').map((url: string) => url.trim()),
+      images: previewImages,
     };
 
     editProduct(Number(productId), updatedProduct);
@@ -92,7 +101,7 @@ const UpdateProduct: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit(submitHandler)}
-      className="border max-h-90 overflow-y-scroll p-5"
+      className="flex flex-col gap-5 max-h-[80vh] overflow-y-scroll p-5"
     >
       <Input
         {...register('title', { required: 'Title is required' })}
@@ -142,41 +151,29 @@ const UpdateProduct: React.FC = () => {
         label="Category Name"
         type="text"
       />
-      <Input
-        {...register('categoryImage', {
-          required: 'Category Image is required',
-          pattern: {
-            value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/, // Validate URLs
-            message: 'Invalid URL format',
-          },
-        })}
-        error={!!errors.categoryImage}
-        errorMessage={errors.categoryImage?.message || ''}
-        id="categoryImage"
-        name="categoryImage"
-        label="Category Image URL"
-        type="text"
-      />
-      <Input
-        {...register('images', {
-          required: 'Images are required',
-          validate: (value) => {
-            const urls = value.split(',').map((url) => url.trim());
-            const regex =
-              /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-            return (
-              urls.every((url) => regex.test(url)) ||
-              'One or more URLs are invalid'
-            );
-          },
-        })}
-        error={!!errors.images}
-        errorMessage={errors.images?.message || ''}
-        id="images"
-        name="images"
-        label="Product Images (comma-separated URLs)"
-        type="text"
-      />
+      <div>
+        <label htmlFor="images">Upload Product Images:</label>
+        <input
+          type="file"
+          id="images"
+          name="images"
+          accept="image/*"
+          multiple
+          onChange={handleImageChange}
+        />
+        {imageError && <p style={{ color: 'red' }}>{imageError}</p>}{' '}
+        <div className="image-preview">
+          {previewImages.map((image, index) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={index}
+              src={image}
+              alt={`Preview ${index + 1}`}
+              style={{ maxWidth: '100px', maxHeight: '100px', margin: '5px' }}
+            />
+          ))}
+        </div>
+      </div>
       <div className="flex justify-center gap-5 pt-5">
         <Button text="Update" />
         <Button text="Close" onClick={closeHandler} />

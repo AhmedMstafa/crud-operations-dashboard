@@ -12,7 +12,7 @@ interface InputProps {
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ type, name, id, label, error, errorMessage, ...rest }, ref) => {
     return (
-      <div className="relative flex flex-col gap-2.5 py-5">
+      <div className="relative flex flex-col">
         <label className="text-center" htmlFor={id}>
           {label || name}
         </label>
@@ -25,7 +25,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
           <input
             ref={ref}
-            className={`border bg-white text-black p-1 w-full ${
+            className={`border bg-white text-black p-1 w-full outline-0 ${
               error ? 'border-red-500' : 'border-black'
             }`}
             id={id}

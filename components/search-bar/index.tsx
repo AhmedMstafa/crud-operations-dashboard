@@ -1,6 +1,7 @@
 'use client';
 import React, { useRef, useState } from 'react';
 import ProductsContext from '@/store/product-context';
+import { IoSearchOutline } from 'react-icons/io5';
 
 const SearchPar: React.FC = () => {
   const { setMatchesSearchTerm } = React.use(ProductsContext);
@@ -29,12 +30,15 @@ const SearchPar: React.FC = () => {
   };
 
   return (
-    <input
-      value={searchTerm}
-      onChange={onChangeHandler}
-      className="border bg-white grow-1 text-black px-5"
-      placeholder="Search for product"
-    />
+    <div className="relative grow-1">
+      <IoSearchOutline className="absolute left-2 top-1/2 -translate-y-1/2 w-5 h-5" />
+      <input
+        value={searchTerm}
+        onChange={onChangeHandler}
+        className="outline-0 rounded-full p-2 pl-10 transition focus:w-full bg-gray-700"
+        placeholder="Search Products..."
+      />
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from '@/components/header';
 import ProductsList from '@/components/products-list';
 import { ProductsContextProvider } from '@/store/product-context';
 import { PopupContextProvider } from '@/store/popup-context';
@@ -9,7 +8,6 @@ import MainNav from '@/components/main-nav';
 const Home: React.FC = () => {
   return (
     <ProductsContextProvider>
-      <Header />
       <main>
         <PopupContextProvider>
           <MainNav />
