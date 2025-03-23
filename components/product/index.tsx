@@ -2,8 +2,7 @@
 import React from 'react';
 import Actions from '../actions';
 import inProduct from '@/models/product';
-import ProductsContext, { ProductActionType } from '@/store/product-context';
-import PopupContext, { PopupType } from '@/store/popup-context';
+import ProductsContext from '@/store/product-context';
 import Image from 'next/image';
 
 interface ProductProps {
@@ -11,37 +10,17 @@ interface ProductProps {
 }
 
 const Product: React.FC<ProductProps> = ({ product }) => {
-  const { openPopup } = React.useContext(PopupContext);
-  const { matchedProductIds, viewDetails } = React.useContext(ProductsContext);
-
-  function actionHandler(action: ProductActionType) {
-    switch (action) {
-      case ProductActionType.EDIT_PRODUCT:
-        openPopup(product.id, PopupType.EDIT_PRODUCT);
-        viewDetails(product.id);
-        break;
-
-      case ProductActionType.DELETE_PRODUCT:
-        openPopup(product.id, PopupType.DELETE_PRODUCT);
-        break;
-
-      case ProductActionType.VIEW_DETAILS:
-        openPopup(product.id, PopupType.VIEW_PRODUCT_DETAILS);
-        viewDetails(product.id);
-        break;
-
-      default:
-        break;
-    }
-  }
+  const [isActionVisible, setIsActionVisible] = React.useState<boolean>(false); // Explicitly typed
+  const { matchedProductIds } = React.useContext(ProductsContext);
 
   const isMatched = matchedProductIds.includes(product.id);
 
   return (
     <article
-      className={`order-${
-        isMatched ? 'first ' : 'last opacity-10 '
-      } flex flex-col items-center hover:opacity-100 transition`}
+      onClick={() => setIsActionVisible((prev) => !prev)}
+      className={`${
+        isMatched ? 'flex' : 'hidden'
+      } flex-col items-center hover:opacity-100 transition`}
     >
       <div className="space-y-2">
         <div className="relative overflow-hidden bg-gray-100 flex justify-center group cursor-pointer border">
@@ -55,7 +34,7 @@ const Product: React.FC<ProductProps> = ({ product }) => {
               priority
             />
           </div>
-          <Actions onClick={actionHandler} />
+          <Actions {...{ product, isActionVisible }} />
         </div>
       </div>
       <div className="w-[260px] md:w-[325px]">
