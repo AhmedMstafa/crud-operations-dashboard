@@ -16,7 +16,7 @@ const PopUp: React.FC = () => {
         !isOpen ? 'hidden' : ''
       } fixed bg-white/20 top-0 left-0 right-0 bottom-0 z-50`}
     >
-      <div className="border absolute left-[50%] top-[50%] translate-[-50%] max-h-screen max-w-90 bg-gray-900">
+      <div className="border absolute left-[50%] top-[50%] translate-[-50%] max-h-screen w-90 bg-gray-900">
         {popupType === PopupType.ADD_PRODUCT ? (
           <AddProduct />
         ) : popupType === PopupType.EDIT_PRODUCT ? (
