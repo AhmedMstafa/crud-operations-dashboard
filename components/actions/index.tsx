@@ -33,6 +33,7 @@ const Actions: React.FC<{
 
   return (
     <div
+      onClick={(e) => e.stopPropagation()}
       className={`${
         isActionVisible ? 'translate-y-0' : 'translate-y-full'
       } absolute flex justify-evenly bg-black text-white bottom-0 left-0 right-0 text-center group-hover:translate-y-0 transition`}
