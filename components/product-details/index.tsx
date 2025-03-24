@@ -15,7 +15,7 @@ const ProductDetails: React.FC = () => {
   if (!selectedProduct) return null;
 
   return (
-    <div className="p-5">
+    <div className="p-5 overflow-y-auto">
       <div className="flex flex-col justify-center gap-5">
         <h2 className="text-2xl font-bold text-center">
           {selectedProduct.title}
