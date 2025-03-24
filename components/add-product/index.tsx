@@ -75,7 +75,7 @@ const AddProduct: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit(submitHandler)}
-      className="flex flex-col gap-5 max-h-[80vh] overflow-y-scroll p-5"
+      className="flex flex-col gap-5 max-h-[80vh] overflow-y-auto p-5"
     >
       <Input
         {...register('title', { required: 'Title is required' })}
